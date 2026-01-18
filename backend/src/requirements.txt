@@ -6,8 +6,5 @@ PyJWT
 requests
 urllib3==1.26.6
 python-dotenv
-alembic
-sqlalchemy
-psycopg2-binary
 pandas
 google-auth
