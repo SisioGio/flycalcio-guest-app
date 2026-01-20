@@ -11,7 +11,7 @@ ACCESS_TOKEN_EXPIRATION= os.environ.get("ACCESS_TOKEN_EXPIRATION",600)
 REFRESH_TOKEN_EXPIRATION= os.environ.get("REFRESH_TOKEN_EXPIRATION",600)
 
 
-def refresh_access_token(event):
+def refresh_access_token(event,context):
     try:
 
         # refresh_token = get_cookie(event, "refresh_token")
@@ -19,8 +19,9 @@ def refresh_access_token(event):
         decoded = decode_token(refresh_token,'refresh')
         principal_id = decoded['id']
         email = decoded['email']
-        access_token = generate_access_token(principal_id,email,duration=int(ACCESS_TOKEN_EXPIRATION))
-        refresh_token = generate_refresh_token(principal_id,email,duration=int(REFRESH_TOKEN_EXPIRATION))
+        role = decoded['role']
+        access_token = generate_access_token(principal_id,email,role,duration=int(ACCESS_TOKEN_EXPIRATION))
+        refresh_token = generate_refresh_token(principal_id,email,role,duration=int(REFRESH_TOKEN_EXPIRATION))
         
         
         return generate_response(200,{

@@ -1,83 +1,80 @@
 import json
-from utils import generate_response
-from db import execute_query
+import os
+import uuid
+from datetime import datetime
 
+import boto3
+from boto3.dynamodb.conditions import Key
 
+from utils import generate_response, logger, tracer
+from dotenv import load_dotenv
+load_dotenv()
 
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table(os.environ["DB_TABLE"])
+
+@tracer.capture_lambda_handler
 def lambda_handler(event, context):
     method = event.get("httpMethod")
     path = event.get("path")
-    if path  == '/category':
-        if method == 'GET':
-            return get_category(event)
-        if method == 'POST':
-            return create_category(event)
-        if method == 'PUT':
-            return update_category(event)
-        if method == 'DELETE':
-            return delete_category(event)
+    
+    if path  == '/private/me' and method == 'GET':
+        return get_user_data(event)
+    if path  == '/private/events' and method == 'GET':
+        return get_user_events(event)
     else:
         return generate_response(400, {"msg": "Invalid route or method.", "event": event},event=event)
-
-
-
-def get_category(event):
-    user_id = event['requestContext']['authorizer']['principalId']
-    query = "SELECT * FROM category WHERE user_id = %s"
-    result = execute_query(query, (user_id,))
-    return generate_response(200, {"data": result},event=event)
-
-
-def update_category(event):
-    user_id = event['requestContext']['authorizer']['principalId']
-    body = json.loads(event.get('body', '{}'))
-    id = body.get('id')
-    name = body.get('name')
-
-    if not id:
-        return generate_response(400, {"msg": "'id' is required to update a category."},event=event)
-
-    query = """
-        UPDATE category
-        SET name = %s
-        WHERE user_id = %s AND id = %s
-        RETURNING *
-    """
-    result = execute_query(query, (name, user_id, id),commit=True)
-    if not result:
-        return generate_response(404, {"msg": "Category not found."},event=event)
-
-    return generate_response(200, {"msg": "Category updated", "data": result},event=event)
-
-def create_category(event):
-    user_id = event['requestContext']['authorizer']['principalId']
-    body = json.loads(event.get('body', '{}'))
-    name = body.get('name')
+@tracer.capture_method
+def get_user_data(event):
+    try:
+        authorizer = event['requestContext']['authorizer']
+        user_id = authorizer['principalId']
+        role = authorizer.get('role')
+        
+        # Fetch user data from DynamoDB
+        response = table.get_item(
+            Key = {"PK":f"USER#{user_id}","SK":"PROFILE"}
+        )
+        if 'Item' not in response:
+            logger.warning(f"User not found: {user_id}")
+            return generate_response(404, {"msg": "User not found"}, event=event)
+        user = response['Item']
+        # Remove sensitive information
+        user.pop('password', None)
+        return generate_response(200, {"user": user}, event=event)
     
+    except Exception as e:
+        logger.exception(f"Error retrieving user data: {str(e)}")
 
-    if not name:
-        return generate_response(400, {"msg": "'name'  are required."},event=event)
 
-    query = """
-        INSERT INTO category (user_id, name)
-        VALUES (%s, %s)
-        RETURNING *
-    """
-    result = execute_query(query, (user_id, name),commit=True)
-    return generate_response(201, {"msg": "category created", "data": result},event=event)
-
-def delete_category(event):
-    user_id = event['requestContext']['authorizer']['principalId']
-    body = json.loads(event.get('body', '{}'))
-    id = body.get('id')
-
-    if not id:
-        return generate_response(400, {"msg": "'id' is required to delete a category."},event=event)
-
-    query = "DELETE FROM category WHERE user_id = %s AND id = %s RETURNING *"
-    result = execute_query(query, (user_id, id),commit=True)
-    print(user_id)
-    if not result:
-        return generate_response(404, {"msg": "category not found."},event=event)
-
-    return generate_response(200, {"msg": "category deleted", "data": result},event=event)
+@tracer.capture_method
+def get_user_events(event):
+    try:
+        authorizer = event['requestContext']['authorizer']
+        user_id = authorizer['principalId']
+        role = authorizer.get('role')
+        
+        # Fetch user data from DynamoDB
+        response = table.get_item(
+            Key = {"PK":f"USER#{user_id}","SK":"PROFILE"}
+        )
+        if 'Item' not in response:
+            logger.warning(f"User not found: {user_id}")
+            return generate_response(404, {"msg": "User not found"}, event=event)
+        user = response['Item']
+        
+        user_events_response = table.query(
+            IndexName="GSI1",
+            KeyConditionExpression=(
+                Key("GSI1PK").eq(f"USER#{user_id}") &
+                Key("GSI1SK").begins_with("EVENT#")
+            ))
+        
+        
+        events= user_events_response.get('Items', [])
+        events = sorted(events, key=lambda x: x["date"], reverse=True)
+        
+        return generate_response(200, {"events": events}, event=event)
+    
+    except Exception as e:
+        logger.exception(f"Error retrieving user data: {str(e)}")

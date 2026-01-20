@@ -1,45 +1,62 @@
 from handler import lambda_handler
-
 import json
-import random
+import uuid
+from datetime import datetime
 
-def create_event(method,path,body):
-    event = {
-        'methodArn':"method arn",
-        'httpMethod':method,
-        'path':path,
-        'body':json.dumps(body)
+# ---- MOCK ADMIN USER ----
+ADMIN_USER = {
+    "userId": "d2ee996b-0dfe-4958-846c-139cf251f384",
+    "email": "alessio@gmail.com",
+    "role": "ADMIN",  # force admin for tests
+}
+NORMAL_USER = {
+    "userId": "570046bc-50f2-4ca9-94d0-1d2b70179522",
+    "email": "user@gmail.com",
+    "role": "USER",
+}
+
+# ---- EVENT FACTORY ----
+def create_event(user,method, path, body=None):
+    return {
+        "httpMethod": method,
+        "path": path,
+        "headers": {
+            "origin": "http://localhost:3000"
+        },
+        "body": json.dumps(body) if body else None,
+        "requestContext": {
+            "authorizer": {
+                "principalId": user["userId"],
+                "role": user["role"],
+                "email": user["email"],
+            }
+        }
     }
-    return event
-def test_register(email,password):
-    body = {
-        'email':email,
-        "password":password
-    }
-    event = create_event('POST','/auth/register',body)
-    response = lambda_handler(event,None)
+
+
+# ---- TESTS ----
+def test_get_user_profiel():
+    print("\n--- GET USER ---")
+    event = create_event(
+        NORMAL_USER,
+        "GET",
+        "/private/me",
+      None)
+    response = lambda_handler(event, None)
     print(response)
-    return response
-    
+    return json.loads(response["body"])['user']
 
-def test_login(email,password):
-    body = {
-        'email':email,
-        "password":password
-    }
-    event = create_event('POST','/auth/login',body)
-    response = lambda_handler(event,None)
+
+def test_get_user_events():
+    print("\n--- GET USER EVENTS ---")
+    event = create_event(NORMAL_USER,"GET", "/private/events")
+    response = lambda_handler(event, None)
     print(response)
-    body = json.loads(response['body'])
-    
-    access_token = body['access_token']
-    refresh_token = body['refresh_token']
-    return access_token,refresh_token
 
+
+# ---- RUN ALL ----
 if __name__ == "__main__":
-    r_digit = random.randint(1,10000)
-    email = f"test{r_digit}@gmail.com"
-    password = f"test_{r_digit}"
-    test_register(email,password)
-    access_token,refresh_token = test_login(email,password)
-    
+    print("=== FlyCalcio Events Lambda Tests ===")
+
+    test_get_user_profiel()
+    test_get_user_events()

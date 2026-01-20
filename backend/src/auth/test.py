@@ -80,17 +80,28 @@ def test_refresh_token(event):
     refresh_token = body['refresh_token']
     return access_token,refresh_token
 
+def create_admin():
 
-if __name__ == "__main__":
-    r_digit = random.randint(1,10000)
-    email = "testuser2083@example.com"
+    email = "alessio@gmail.com"
     password = "password"
-    
 
-    
-    
+    response = test_register(email,password)
+
     access_token,refresh_token = test_login(email,password)
     
-    access_token,refresh_token = test_refresh_token(event=create_event('POST','/auth/refresh',{},cookies=f"refresh_token={refresh_token}"))
+    access_token,refresh_token = test_refresh_token(event=create_event('POST','/auth/refresh',{'refresh_token':refresh_token},cookies=f"refresh_token={refresh_token}"))
     
+def create_user():
+
+    email = "user@gmail.com"
+    password = "password"
+
+    response = test_register(email,password)
+
+    access_token,refresh_token = test_login(email,password)
     
+    access_token,refresh_token = test_refresh_token(event=create_event('POST','/auth/refresh',{'refresh_token':refresh_token},cookies=f"refresh_token={refresh_token}"))
+    
+if __name__ == "__main__":
+
+    create_user()

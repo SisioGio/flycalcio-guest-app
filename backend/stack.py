@@ -60,7 +60,7 @@ class MyApiStack(Stack):
         app_table = dynamo.Table(
             self,
             f"FinalyzeAppTable-{env}",
-            table_name=generate_name("finalyze", env, "table"),
+            table_name=generate_name("app", env, "table"),
             partition_key=dynamo.Attribute(
                 name="PK",
                 type=dynamo.AttributeType.STRING
