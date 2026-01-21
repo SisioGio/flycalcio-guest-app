@@ -103,46 +103,17 @@ def generate_response(
     refresh_token=None,
     event=None
 ):
-    # ---- Origin handling ----
-    origin = None
-    if event and "headers" in event:
-        origin = event["headers"].get("origin") or event["headers"].get("Origin")
-    if origin is None:
-        origin = os.getenv("DEFAULT_CORS_ORIGIN")
-        
-        
-    print(f"Found origin: {origin}")
+
 
     # ---- Base CORS headers ----
     response_headers = {
         "Access-Control-Allow-Headers": "Content-Type,Authorization",
         "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Credentials": "true",
         "Content-Type": "application/json"
     }
 
     if headers:
         response_headers.update(headers)
-
-    if origin and origin in ALLOWED_ORIGINS:
-        response_headers["Access-Control-Allow-Origin"] = origin
-    else:
-        print(f"Origin not allowed or missing: {origin}")
-
-    # ---- Cookies (REST API requires multiValueHeaders) ----
-    cookies = []
-
-    if access_token:
-        cookies.append(
-            f"access_token={access_token}; "
-            "HttpOnly; Secure; SameSite=None; Path=/"
-        )
-
-    if refresh_token:
-        cookies.append(
-            f"refresh_token={refresh_token}; "
-            "HttpOnly; Secure; SameSite=None; Path=/dev/auth/refresh"
-        )
 
     response = {
         "statusCode": status_code,
@@ -150,11 +121,6 @@ def generate_response(
         "body": json.dumps(body, default=serialize)
     }
 
-    # IMPORTANT: only add multiValueHeaders if cookies exist
-    # if cookies:
-    #     response["multiValueHeaders"] = {
-    #         "Set-Cookie": cookies
-    #     }
 
     return response
   
