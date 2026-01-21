@@ -1,5 +1,5 @@
 import json
-from db import execute_query
+
 from utils import verify_password, generate_access_token, generate_refresh_token,generate_response
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -24,18 +24,7 @@ def login_google(event):
         )
 
         email = idinfo.get("email")
-        query = "SELECT id FROM users WHERE email=%s;"
-        users = execute_query(query, (email,))
-        if not users:
-            
-            query = "INSERT INTO users (email,password_hash,initial_balance) VALUES (%s,%s,0) RETURNING id;"
-            ids = execute_query(query, (email,google_token[:100]),commit=True)
-            id=ids[0]['id']
-            query = "INSERT INTO scenarios (code,description,user_id) VALUES (%s,%s) RETURNING id;"
-            ids = execute_query(query, ('Default','Default scenario',id),commit=True)
-            
-        else:
-            id = users[0]['id']
+        
 
         access_token = generate_access_token(id,email,duration=int(ACCESS_TOKEN_EXPIRATION))
         refresh_token = generate_refresh_token(id,email,duration=int(REFRESH_TOKEN_EXPIRATION))

@@ -10,7 +10,7 @@ from datetime import datetime, date
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from datetime import date, timedelta
-import pandas as pd
+
 load_dotenv()
 
 from aws_lambda_powertools import Logger, Tracer
