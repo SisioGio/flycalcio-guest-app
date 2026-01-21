@@ -112,7 +112,7 @@ class MyApiStack(Stack):
             "ACCESS_TOKEN_EXPIRATION":"600",
             "REFRESH_TOKEN_EXPIRATION":"86400",
             "DEFAULT_CORS_ORIGIN":"https://finalyze.alessiogiovannini.com",
-            'DB_TABLE_NAME': app_table.table_name
+            'DB_TABLE': app_table.table_name
             
         }
         
