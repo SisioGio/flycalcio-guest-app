@@ -40,8 +40,8 @@ def get_secret(secret_name, region_name="eu-central-1"):
         else:
             import base64
             return json.loads(base64.b64decode(response['SecretBinary']))
-JWT_SECRET_NAME = os.environ.get("JWT_SECRET_NAME",'finalyze-jwtkey-dev-secret')
-JWT_REFRESH_NAME= os.environ.get("JWT_REFRESH_SECRET_NAME",'finalyze-jwt-refresh-key-dev-secret')
+JWT_SECRET_NAME = os.environ.get("JWT_SECRET_NAME",'flycalcio-jwtkey-dev-secret')
+JWT_REFRESH_NAME= os.environ.get("JWT_REFRESH_SECRET_NAME",'flycalcio-jwt-refresh-key-dev-secret')
 
 
 
