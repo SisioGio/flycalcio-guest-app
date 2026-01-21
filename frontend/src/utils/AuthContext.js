@@ -16,14 +16,14 @@ export const AuthProvider = ({ children }) => {
 
     localStorage.getItem('access_token');
     
-    const res = await apiClient.get("/private/signin");
+    const res = await apiClient.get("/private/me");
 
     showNotification({ text: "Logged in with token", error: false });
     setAuth(res.data.data);
   } catch (error) {
     console.error("Token validation failed", error);
     showNotification({
-      text:  `Token validation failed: ${JSON.stringify(error.toJSON())}`,
+      text:  `Token validation failed`,
       error: true,
     });
     logout();

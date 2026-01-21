@@ -14,6 +14,12 @@ module.exports = {
           '100%': { opacity: 1, transform: 'translateY(0)' },
         },
       },
+      colors: {
+        flyRed: "#E10600",
+        flyChar: "#1A1A1A",
+        flyGold: "#FFC300",
+        flyBlue: "#0047AB",
+      },
     }
   },
   plugins: [],

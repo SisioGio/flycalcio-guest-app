@@ -6,11 +6,6 @@ from src.loging_google import login_google
 from src.refresh_token import refresh_access_token
 from utils import generate_response
 
-# from src.verify_account import verify_account
-# from src.send_confirmation_email import send_confirmation_email
-# from src.refresh_token import refresh_access_token
-# from src.request_reset import request_password_reset
-# from src.reset_password import reset_password
 
 
 

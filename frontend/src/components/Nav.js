@@ -25,9 +25,9 @@ export default function Nav() {
   };
 
   const tabs = [
-    { path: "/dashboard", label: "Dashboard" },
-    { path: "/actuals", label: "Actuals" },
-    { path: "/settings", label: "Settings" },
+    { path: "/", label: "Home" },
+    { path: "/events", label: "My Events" },
+    { path: "/profile", label: "Profile" },
   ];
 
   return (
@@ -36,12 +36,12 @@ export default function Nav() {
       <nav className="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex items-center justify-between">
         {/* LOGO */}
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-fuchsia-500 to-indigo-500 shadow-lg shadow-fuchsia-500/40" />
+          <div className="w-8 h-8 rounded-lg bg-black shadow-lg shadow-slate-500/40" />
           <NavLink
             to="/"
             className="text-xl sm:text-2xl font-extrabold tracking-wide text-white"
           >
-            Finalyze
+            FlyCalcio Guests
           </NavLink>
         </div>
 
@@ -92,22 +92,7 @@ export default function Nav() {
 
         {/* DESKTOP SCENARIO + AUTH */}
         <div className="hidden sm:flex items-center gap-3">
-          {auth && (
-            <select
-              value={scenarioId ?? ""}
-              onChange={(e) => setScenarioId(e.target.value)}
-              className="bg-white/5 text-sm text-white rounded-lg px-3 py-2 border border-white/20"
-            >
-              <option value="" className="text-black">
-                Select scenario
-              </option>
-              {scenarios.map((s) => (
-                <option key={s.id} value={s.id} className="text-black">
-                  {s.code}
-                </option>
-              ))}
-            </select>
-          )}
+        
 
           {auth ? (
             <button
@@ -124,12 +109,7 @@ export default function Nav() {
               >
                 Login
               </button>
-              <button
-                onClick={() => navigate("/register")}
-                className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-fuchsia-500 rounded-lg shadow-md"
-              >
-                Register
-              </button>
+              
             </>
           )}
         </div>
@@ -147,7 +127,7 @@ export default function Nav() {
                 className={({ isActive }) =>
                   `block px-4 py-2 rounded-lg text-sm font-semibold ${
                     isActive
-                      ? "bg-gradient-to-r from-indigo-500 to-fuchsia-500 text-white"
+                      ? "bg-slate-800 text-white"
                       : "text-gray-300 hover:bg-white/10"
                   }`
                 }
