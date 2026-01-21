@@ -19,7 +19,7 @@ def register_user(event,context):
         logger.info("Incoming request", extra={"event": event})
         if "body" not in event or not event["body"]:
             logger.warning("Missing request body")
-            return generate_response(400, {"msg": "Invalid request"}, event)
+            return generate_response(400, {"msg": "Invalid request"})
 
         data = json.loads(event["body"])
         email = data.get("email")
@@ -27,7 +27,7 @@ def register_user(event,context):
 
         if not email or not password:
             logger.warning("Missing email or password")
-            return generate_response(400, {"msg": "Email and password are required"}, event)
+            return generate_response(400, {"msg": "Email and password are required"})
 
         # 🔍 Check if user already exists (GSI)
         existing_user = table.query(
@@ -38,7 +38,7 @@ def register_user(event,context):
 
         if existing_user["Count"] > 0:
             logger.info("User already exists", extra={"email": email})
-            return generate_response(409, {"msg": "User already exists"}, event)
+            return generate_response(409, {"msg": "User already exists"})
 
         user_id = str(uuid.uuid4())
         hashed_password = hash_password(password)

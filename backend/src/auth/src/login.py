@@ -23,7 +23,7 @@ def login(event: dict, context):
         logger.info("Login request received")
         if not event.get("body"):
             logger.warning("Missing body")
-            return generate_response(400, {"msg": "Invalid request"}, event)
+            return generate_response(400, {"msg": "Invalid request"})
 
         body = json.loads(event["body"])
         email = body.get("email")
@@ -32,7 +32,7 @@ def login(event: dict, context):
         if not email or not password:
             logger.warning("Missing credentials")
             return generate_response(
-                400, {"msg": "Email and password required"}, event
+                400, {"msg": "Email and password required"}
             )
 
         # 🔍 Fetch user by email (GSI)
@@ -48,7 +48,7 @@ def login(event: dict, context):
         if response["Count"] == 0:
             logger.info("User not found", extra={"email": email})
             return generate_response(
-                401, {"msg": "Invalid credentials"}, event
+                401, {"msg": "Invalid credentials"}
             )
 
         user = response["Items"][0]
@@ -57,13 +57,13 @@ def login(event: dict, context):
         if user["password"] != hash_password(password):
             logger.info("Invalid password", extra={"email": email})
             return generate_response(
-                401, {"msg": "Invalid credentials"}, event
+                401, {"msg": "Invalid credentials"}
             )
 
         # if not user.get("confirmed", False):
         #     logger.info("User not confirmed", extra={"email": email})
         #     return generate_response(
-        #         403, {"msg": "Account not confirmed"}, event
+        #         403, {"msg": "Account not confirmed"}
         #     )
 
         access_token=generate_access_token(user['userId'],email,user["role"],int(ACCESS_TOKEN_EXPIRATION))

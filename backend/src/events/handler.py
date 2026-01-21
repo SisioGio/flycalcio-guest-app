@@ -63,7 +63,7 @@ def get_events(event):
                 IndexName="GSI1",
                 KeyConditionExpression=Key("GSI1PK").eq("EVENT")
             )
-            return generate_response(200, {"events": resp["Items"]}, event)
+            return generate_response(200, {"events": resp["Items"]})
 
         # USER → assigned events
         logger.info("Listing user events", extra={"userId": user_id})
@@ -87,19 +87,19 @@ def get_events(event):
             if event_item:
                 events.append(event_item)
 
-        return generate_response(200, {"events": events}, event)
+        return generate_response(200, {"events": events})
 
     except Exception:
         logger.exception("Failed to fetch events")
         tracer.put_annotation("error_type", "unhandled")
-        return generate_response(500, {"msg": "Internal server error"}, event)
+        return generate_response(500, {"msg": "Internal server error"})
 
 
 def create_event(event):
     user_id, role = _auth_context(event)
 
     if role != "ADMIN":
-        return generate_response(403, {"msg": "Forbidden"}, event)
+        return generate_response(403, {"msg": "Forbidden"})
 
     try:
         body = json.loads(event.get("body", "{}"))
@@ -134,26 +134,26 @@ def create_event(event):
         )
 
         logger.info("Event created", extra={"eventId": event_id})
-        return generate_response(201, {"event": item}, event)
+        return generate_response(201, {"event": item})
 
     except Exception:
         logger.exception("Failed to create event")
         tracer.put_annotation("error_type", "unhandled")
-        return generate_response(500, {"msg": "Internal server error"}, event)
+        return generate_response(500, {"msg": "Internal server error"})
 
 
 def update_event(event):
     user_id, role = _auth_context(event)
 
     if role != "ADMIN":
-        return generate_response(403, {"msg": "Forbidden"}, event)
+        return generate_response(403, {"msg": "Forbidden"})
 
     try:
         body = json.loads(event.get("body", "{}"))
         event_id = body.get("eventId")
 
         if not event_id:
-            return generate_response(400, {"msg": "eventId required"}, event)
+            return generate_response(400, {"msg": "eventId required"})
 
         update_expr = []
         expr_vals = {}
@@ -169,7 +169,7 @@ def update_event(event):
                 expr_vals[placeholder_value] = body[field]
 
         if not update_expr:
-            return generate_response(400, {"msg": "No fields to update"}, event)
+            return generate_response(400, {"msg": "No fields to update"})
 
         
         table.update_item(
@@ -183,12 +183,12 @@ def update_event(event):
         )
 
         logger.info("Event updated", extra={"eventId": event_id})
-        return generate_response(200, {"msg": "Event updated"}, event)
+        return generate_response(200, {"msg": "Event updated"})
 
     except Exception:
         logger.exception("Failed to update event")
         tracer.put_annotation("error_type", "unhandled")
-        return generate_response(500, {"msg": "Internal server error"}, event)
+        return generate_response(500, {"msg": "Internal server error"})
 
 
 
@@ -196,14 +196,14 @@ def delete_event(event):
     user_id, role = _auth_context(event)
 
     if role != "ADMIN":
-        return generate_response(403, {"msg": "Forbidden"}, event)
+        return generate_response(403, {"msg": "Forbidden"})
 
     try:
         body = json.loads(event.get("body", "{}"))
         event_id = body.get("eventId")
 
         if not event_id:
-            return generate_response(400, {"msg": "eventId required"}, event)
+            return generate_response(400, {"msg": "eventId required"})
 
         
         table.delete_item(
@@ -214,12 +214,12 @@ def delete_event(event):
         )
 
         logger.info("Event deleted", extra={"eventId": event_id})
-        return generate_response(200, {"msg": "Event deleted"}, event)
+        return generate_response(200, {"msg": "Event deleted"})
 
     except Exception:
         logger.exception("Failed to delete event")
         tracer.put_annotation("error_type", "unhandled")
-        return generate_response(500, {"msg": "Internal server error"}, event)
+        return generate_response(500, {"msg": "Internal server error"})
     
     
     
@@ -227,7 +227,7 @@ def assign_user_to_event(event):
     admin_id, role = _auth_context(event)
 
     if role != "ADMIN":
-        return generate_response(403, {"msg": "Forbidden"}, event)
+        return generate_response(403, {"msg": "Forbidden"})
 
     try:
         body = json.loads(event.get("body", "{}"))
@@ -235,7 +235,7 @@ def assign_user_to_event(event):
         event_id = body.get("eventId")
 
         if not user_id or not event_id:
-            return generate_response(400, {"msg": "userId and eventId required"}, event)
+            return generate_response(400, {"msg": "userId and eventId required"})
 
         item = {
             "PK": f"USER#{user_id}",
@@ -253,11 +253,11 @@ def assign_user_to_event(event):
         )
 
         logger.info("User assigned to event", extra={"userId": user_id, "eventId": event_id})
-        return generate_response(201, {"msg": "User assigned to event", "assignment": item}, event)
+        return generate_response(201, {"msg": "User assigned to event", "assignment": item})
 
     except Exception:
         logger.exception("Failed to assign user to event")
-        return generate_response(500, {"msg": "Internal server error"}, event)
+        return generate_response(500, {"msg": "Internal server error"})
 
 
 # ---------------- remove user ----------------
@@ -265,7 +265,7 @@ def remove_user_from_event(event):
     admin_id, role = _auth_context(event)
 
     if role != "ADMIN":
-        return generate_response(403, {"msg": "Forbidden"}, event)
+        return generate_response(403, {"msg": "Forbidden"})
 
     try:
         body = json.loads(event.get("body", "{}"))
@@ -273,7 +273,7 @@ def remove_user_from_event(event):
         event_id = body.get("eventId")
 
         if not user_id or not event_id:
-            return generate_response(400, {"msg": "userId and eventId required"}, event)
+            return generate_response(400, {"msg": "userId and eventId required"})
 
         table.delete_item(
             Key={
@@ -283,8 +283,8 @@ def remove_user_from_event(event):
         )
 
         logger.info("User removed from event", extra={"userId": user_id, "eventId": event_id})
-        return generate_response(200, {"msg": "User removed from event"}, event)
+        return generate_response(200, {"msg": "User removed from event"})
 
     except Exception:
         logger.exception("Failed to remove user from event")
-        return generate_response(500, {"msg": "Internal server error"}, event)
+        return generate_response(500, {"msg": "Internal server error"})

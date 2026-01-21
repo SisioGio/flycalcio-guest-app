@@ -97,11 +97,7 @@ ALLOWED_ORIGINS = [
 
 def generate_response(
     status_code,
-    body,
-    headers=None,
-    access_token=None,
-    refresh_token=None,
-    event=None
+    body
 ):
     # ---- Base CORS headers ----
     response_headers = {
@@ -111,8 +107,6 @@ def generate_response(
         "Content-Type": "application/json"
     }
 
-    if headers:
-        response_headers.update(headers)
 
     response = {
         "statusCode": status_code,
