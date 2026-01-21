@@ -1,5 +1,5 @@
 import json
-from db import execute_query
+
 from utils import verify_password, generate_access_token, generate_refresh_token,generate_response,tracer,logger,hash_password
 import os
 from dotenv import load_dotenv

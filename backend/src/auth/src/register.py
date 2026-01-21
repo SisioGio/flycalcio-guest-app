@@ -1,5 +1,5 @@
 import json
-from db import execute_query
+
 from utils import hash_password, send_email,generate_response,tracer,logger
 import uuid
 from datetime import datetime

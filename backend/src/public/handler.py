@@ -1,6 +1,6 @@
 import json
 from utils import generate_response
-from db import execute_query
+
 
 
 
