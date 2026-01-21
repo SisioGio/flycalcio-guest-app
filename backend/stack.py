@@ -90,7 +90,7 @@ class MyApiStack(Stack):
        
         
             
-    
+        app_table.grant_read_write_data(shared_lambda_role)
 
             
         # Grant read access to secrets
