@@ -103,12 +103,11 @@ def generate_response(
     refresh_token=None,
     event=None
 ):
-
-
     # ---- Base CORS headers ----
     response_headers = {
         "Access-Control-Allow-Headers": "Content-Type,Authorization",
         "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Origin":"*",
         "Content-Type": "application/json"
     }
 
