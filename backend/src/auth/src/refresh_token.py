@@ -24,6 +24,8 @@ def refresh_access_token(event,context):
         refresh_token = generate_refresh_token(principal_id,email,role,duration=int(REFRESH_TOKEN_EXPIRATION))
         
         
+        
+        
         return generate_response(200,{
                 'msg':'new_token',
                 "access_token": access_token,
