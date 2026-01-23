@@ -24,7 +24,7 @@ def lambda_handler(event, context):
         return delete_scenario(event)
 
     
-    return generate_response(400, {"msg": "Invalid route or method.", "event": event},event=event)
+    return generate_response(400, {"msg": "Invalid route or method."})
 
 
 

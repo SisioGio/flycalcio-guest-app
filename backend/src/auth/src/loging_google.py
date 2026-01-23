@@ -31,19 +31,18 @@ def login_google(event):
         response = generate_response(200,{
                 "access_token": access_token,
                 "refresh_token": refresh_token
-            },
-            access_token=access_token,refresh_token=refresh_token,event=event)
+            })
         print(response)
 
         return response
         
     except Exception as e:
         print(e)
-        return generate_response(500,{"msg": str(e)},event=event)
+        return generate_response(500,{"msg": str(e)})
     except ValueError as e:
         # Token verification failed
         print(e)
-        return generate_response(500,{"msg": "Invalid Google token"},event=event)
+        return generate_response(500,{"msg": "Invalid Google token"})
     except Exception as e:
         print(e)
-        return generate_response(500,{"msg": str(e)},event=event)
+        return generate_response(500,{"msg": str(e)})

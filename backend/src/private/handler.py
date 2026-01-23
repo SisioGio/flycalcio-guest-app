@@ -23,7 +23,7 @@ def lambda_handler(event, context):
     if path  == '/private/events' and method == 'GET':
         return get_user_events(event)
     else:
-        return generate_response(400, {"msg": "Invalid route or method.", "event": event},event=event)
+        return generate_response(400, {"msg": "Invalid route or method."})
 @tracer.capture_method
 def get_user_data(event):
     try:

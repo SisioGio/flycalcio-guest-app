@@ -17,7 +17,7 @@ def lambda_handler(event, context):
         if method == 'DELETE':
             return delete_category(event)
     else:
-        return generate_response(400, {"msg": "Invalid route or method.", "event": event},event=event)
+        return generate_response(400, {"msg": "Invalid route or method."})
 
 
 
@@ -25,7 +25,7 @@ def get_category(event):
     user_id = event['requestContext']['authorizer']['principalId']
     query = "SELECT * FROM category WHERE user_id = %s"
     result = execute_query(query, (user_id,))
-    return generate_response(200, {"data": result},event=event)
+    return generate_response(200, {"data": result})
 
 
 def update_category(event):
@@ -35,7 +35,7 @@ def update_category(event):
     name = body.get('name')
 
     if not id:
-        return generate_response(400, {"msg": "'id' is required to update a category."},event=event)
+        return generate_response(400, {"msg": "'id' is required to update a category."})
 
     query = """
         UPDATE category
@@ -45,9 +45,9 @@ def update_category(event):
     """
     result = execute_query(query, (name, user_id, id),commit=True)
     if not result:
-        return generate_response(404, {"msg": "Category not found."},event=event)
+        return generate_response(404, {"msg": "Category not found."})
 
-    return generate_response(200, {"msg": "Category updated", "data": result},event=event)
+    return generate_response(200, {"msg": "Category updated", "data": result})
 
 def create_category(event):
     user_id = event['requestContext']['authorizer']['principalId']
@@ -56,7 +56,7 @@ def create_category(event):
     
 
     if not name:
-        return generate_response(400, {"msg": "'name'  are required."},event=event)
+        return generate_response(400, {"msg": "'name'  are required."})
 
     query = """
         INSERT INTO category (user_id, name)
@@ -64,7 +64,7 @@ def create_category(event):
         RETURNING *
     """
     result = execute_query(query, (user_id, name),commit=True)
-    return generate_response(201, {"msg": "category created", "data": result},event=event)
+    return generate_response(201, {"msg": "category created", "data": result})
 
 def delete_category(event):
     user_id = event['requestContext']['authorizer']['principalId']
@@ -72,12 +72,12 @@ def delete_category(event):
     id = body.get('id')
 
     if not id:
-        return generate_response(400, {"msg": "'id' is required to delete a category."},event=event)
+        return generate_response(400, {"msg": "'id' is required to delete a category."})
 
     query = "DELETE FROM category WHERE user_id = %s AND id = %s RETURNING *"
     result = execute_query(query, (user_id, id),commit=True)
     print(user_id)
     if not result:
-        return generate_response(404, {"msg": "category not found."},event=event)
+        return generate_response(404, {"msg": "category not found."})
 
-    return generate_response(200, {"msg": "category deleted", "data": result},event=event)
+    return generate_response(200, {"msg": "category deleted", "data": result})
